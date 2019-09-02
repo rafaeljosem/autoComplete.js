@@ -239,11 +239,9 @@
         var _this = this;
         return new Promise(function (resolve) {
           var resList = [];
-          data.forEach(function(key) {
+          data.forEach(function(record, index) {
             resList.push({
-             key: key,
-             index: index,
-             match: match,
+              index: index,
              value: record
              });   
           });
