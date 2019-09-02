@@ -267,7 +267,7 @@
                   });
                 }
               }
-            };*/
+            };
             if (_this.data.key) {
               var _iteratorNormalCompletion = true;
               var _didIteratorError = false;
@@ -294,7 +294,7 @@
             } else {
               search();
             }
-          });
+          });*/
           var list = _this.sort ? resList.sort(_this.sort).slice(0, _this.maxResults) : resList.slice(0, _this.maxResults);
           if (_this.resultsList.render) {
             autoCompleteView.addResultsToList(_this.resultsList.view, list, _this.resultItem);
