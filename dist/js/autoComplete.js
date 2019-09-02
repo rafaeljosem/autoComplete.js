@@ -239,7 +239,15 @@
         var _this = this;
         return new Promise(function (resolve) {
           var resList = [];
-          data.filter(function (record, index) {
+          data.forEach(function(key) {
+            resList.push({
+             key: key,
+             index: index,
+             match: match,
+             value: record
+             });   
+          });
+          /*data.filter(function (record, index) {
             var search = function search(key) {
               var recordValue = key ? record[key] : record;
               if (recordValue) {
@@ -259,7 +267,7 @@
                   });
                 }
               }
-            };
+            };*/
             if (_this.data.key) {
               var _iteratorNormalCompletion = true;
               var _didIteratorError = false;
