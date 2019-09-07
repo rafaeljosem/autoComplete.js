@@ -99,6 +99,7 @@
               }),
               selection: resultsValues.list.find(function (value) {
                 var resValue = value.value[value.key] || value.value;
+                var closest = event.target.closest(".".concat(select.result)).getAttribute(dataAttribute);
                 return resValue === event.target.closest(".".concat(select.result)).getAttribute(dataAttribute);
               })
             });
@@ -239,25 +240,24 @@
         var _this = this;
         return new Promise(function (resolve) {
           var resList = [];
-          data.forEach(function(record, index) {
-            resList.push({
-              index: index,
-             value: record
-             });   
-          });
-          /*data.filter(function (record, index) {
+          data.filter(function (record, index) {
             var search = function search(key) {
               var recordValue = key ? record[key] : record;
+              //This piece of code checks if the record is already in array. Prevents the record from being duplicated
+              var resFound = resList.find(function (element) {
+                return element.value === record;
+              });
+
               if (recordValue) {
                 var match = typeof _this.searchEngine === "function" ? _this.searchEngine(_this.queryValue, recordValue) : _this.search(_this.queryValue, recordValue);
-                if (match && key) {
+                if (match && key && !resFound) {
                   resList.push({
                     key: key,
                     index: index,
                     match: match,
                     value: record
                   });
-                } else if (match && !key) {
+                } else if (match && !key && !resFound) {
                   resList.push({
                     index: index,
                     match: match,
@@ -292,7 +292,7 @@
             } else {
               search();
             }
-          });*/
+          });
           var list = _this.sort ? resList.sort(_this.sort).slice(0, _this.maxResults) : resList.slice(0, _this.maxResults);
           if (_this.resultsList.render) {
             autoCompleteView.addResultsToList(_this.resultsList.view, list, _this.resultItem);
