@@ -149,7 +149,7 @@ export default class autoComplete {
       // Checks input has matches in data source
       data.filter((record, index) => {
         // Search/Matching function
-        const search = /* key */ _ => {
+        const search = /* key */ () => {
           // This Record value
           // const recordValue = key ? record[key] : record;
           // Check if record does exist before search
@@ -181,7 +181,7 @@ export default class autoComplete {
         if (this.data.key) {
           // Iterates over all set data keys
           // for (const key of this.data.key) {
-            search(/* key */ this.data.key);
+          search(/* key */ this.data.key);
           // }
           // If no data key not set
         } else {
@@ -223,7 +223,7 @@ export default class autoComplete {
      */
     const debounce = (func, delay) => {
       let inDebounce;
-      return function() {
+      return function () {
         const context = this;
         const args = arguments;
         clearTimeout(inDebounce);

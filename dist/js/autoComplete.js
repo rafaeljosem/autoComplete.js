@@ -312,54 +312,26 @@
         return new Promise(function (resolve) {
           var resList = [];
           data.filter(function (record, index) {
-            var search = function search(key) {
-              var recordValue = key ? record[key] : record;
-              //This piece of code checks if the record is already in array. Prevents the record from being duplicated
-              var resFound = resList.find(function (element) {
-                return element.value === record;
-              });
-
-              if (recordValue) {
-                var match = typeof _this.searchEngine === "function" ? _this.searchEngine(_this.queryValue, recordValue) : _this.search(_this.queryValue, recordValue);
-                if (match && key && !resFound) {
-                  resList.push({
-                    key: key,
-                    index: index,
-                    match: match,
-                    value: record
-                  });
-                } else if (match && !key && !resFound) {
-                  resList.push({
-                    index: index,
-                    match: match,
-                    value: record
-                  });
+            var search =
+            function search() {
+              if (record
+              ) {
+                  var match = typeof _this.searchEngine === "function" ? _this.searchEngine(_this.queryValue, record
+                  ) : _this.search(_this.queryValue, record
+                  );
+                  if (match
+                  ) {
+                      resList.push({
+                        index: index,
+                        match: match,
+                        value: record
+                      });
+                    }
                 }
-              }
             };
             if (_this.data.key) {
-              var _iteratorNormalCompletion = true;
-              var _didIteratorError = false;
-              var _iteratorError = undefined;
-              try {
-                for (var _iterator = _this.data.key[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                  var key = _step.value;
-                  search(key);
-                }
-              } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-              } finally {
-                try {
-                  if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-                    _iterator["return"]();
-                  }
-                } finally {
-                  if (_didIteratorError) {
-                    throw _iteratorError;
-                  }
-                }
-              }
+              search(
+              _this.data.key);
             } else {
               search();
             }
