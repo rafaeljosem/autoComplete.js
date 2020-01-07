@@ -1,3 +1,7 @@
+/**
+ * Modified version of autoCompleteJs from lines 156 to 189
+ */
+
 import { autoCompleteView } from "../views/autoCompleteView";
 import { Polyfill } from "../helpers/polyfill";
 
