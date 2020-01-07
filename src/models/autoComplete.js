@@ -3,91 +3,83 @@ import { Polyfill } from "../helpers/polyfill";
 
 export default class autoComplete {
   constructor(config) {
-    // User input Selector
-    this.selector = config.selector || "#autoComplete";
-    // Source of data list
+    const {
+      selector = "#autoComplete", // User input selector
+      data: {
+        key, // Data src key selection
+        src, // Data src selection
+        cache = true, // Flag to cache data src
+      },
+      query, // Query interceptor function
+      trigger: {
+        event = ["input"], // autoCompleteJS event
+        condition = false, // condition trigger
+      } = {},
+      searchEngine = "strict", // Search engine type
+      threshold = 0, // Minimum characters length before engine starts rendering
+      debounce = 0, // Minimum duration for API calls debouncing,
+      resultsList: {
+        render = false,
+        container = false,
+        destination, // Results list selector
+        position = "afterend", // Results list position
+        element: resultsListElement = "ul", // Results list element tag
+        navigation = false, // Results list navigation
+      } = {},
+      sort = false, // Sorting results list
+      placeHolder, // Placeholder text
+      maxResults = 5, // Maximum number of results to show
+      resultItem: {
+        content = false, // Result item function
+        element: resultItemElement = "li", // Result item element tag
+      } = {},
+      noResults, // No results action
+      highlight = false, // Highlighting matching results
+      onSelection, // Action function on result selection
+    } = config;
+
+    // Build results list DOM element
+    const resultsListView = render
+      ? autoCompleteView.createResultsList({
+        container,
+        destination: destination || autoCompleteView.getInput(selector),
+        position,
+        element: resultsListElement,
+      })
+      : null;
+
+    this.selector = selector;
     this.data = {
-      // Data src selection
-      src: () => (typeof config.data.src === "function" ? config.data.src() : config.data.src),
-      // Data src key selection
-      key: config.data.key,
-      // Cache Data src or NOT
-      cache: typeof config.data.cache === "undefined" ? true : config.data.cache,
+      src: () => (typeof src === "function" ? src() : src),
+      key,
+      cache,
     };
-    // Query Interceptor function
-    this.query = config.query;
-    // autoCompleteJS event & conddition trigger
+    this.query = query;
     this.trigger = {
-      event: config.trigger && config.trigger.event ? config.trigger.event : ["input"],
-      condition: config.trigger && config.trigger.condition ? config.trigger.condition : false,
+      event,
+      condition,
     };
-    // Search engine type
     this.searchEngine =
-      config.searchEngine === "loose"
-        ? "loose"
-        : typeof config.searchEngine === "function"
-          ? config.searchEngine
-          : "strict";
-    // Minimum characters length before engine starts rendering
-    this.threshold = config.threshold || 0;
-    // Minimum duration for API calls debouncing
-    this.debounce = config.debounce || 0;
-    // Rendered results destination
+      searchEngine === "loose" ? "loose" : typeof searchEngine === "function" ? searchEngine : "strict";
+    this.threshold = threshold;
+    this.debounce = debounce;
     this.resultsList = {
-      render: config.resultsList && config.resultsList.render ? config.resultsList.render : false,
-      // Allowing shadow dom components to pass its root document
-      shadowRoot:
-        config.resultsList && config.resultsList.shadowRoot ? config.resultsList.shadowRoot : document,
-      view:
-        config.resultsList && config.resultsList.render
-          ? autoCompleteView.createResultsList({
-            // Results List function
-            container:
-                // If resultsList and container are set
-                config.resultsList && config.resultsList.container // Then set resultsList container
-                  ? config.resultsList.container // Else set default false
-                  : false,
-            // Results List selector
-            destination:
-                // If resultsList and destination are set
-                config.resultsList && config.resultsList.destination // Then set resultList destination
-                  ? config.resultsList.destination // Else set Default
-                  : autoCompleteView.getInput(this.selector),
-            // Results List position
-            position:
-                // If resultsList and position are set
-                config.resultsList && config.resultsList.position // Then resultsList position
-                  ? config.resultsList.position // Else set default "afterend"
-                  : "afterend",
-            // Results List element tag
-            element: config.resultsList && config.resultsList.element ? config.resultsList.element : "ul",
-          })
-          : null,
-      // Results List navigation
-      navigation: config.resultsList && config.resultsList.navigation ? config.resultsList.navigation : false,
+      render,
+      view: resultsListView,
+      navigation,
     };
-    // Sorting results list
-    this.sort = config.sort || false;
-    // Placeholder text
-    this.placeHolder = config.placeHolder;
-    // Maximum number of results to show
-    this.maxResults = config.maxResults || 5;
-    // Rendered results item
+    this.sort = sort;
+    this.placeHolder = placeHolder;
+    this.maxResults = maxResults;
     this.resultItem = {
-      // Result Item function
-      content: config.resultItem && config.resultItem.content ? config.resultItem.content : false,
-      // Result Item element tag
-      element: config.resultItem && config.resultItem.element ? config.resultItem.element : "li",
+      content,
+      element: resultItemElement,
     };
-    // No Results action
-    this.noResults = config.noResults;
-    // Highlighting matching results
-    this.highlight = config.highlight || false;
-    // Action function on result selection
-    this.onSelection = config.onSelection;
-    // Data source
-    this.dataSrc;
-    // Starts the app Enigne
+    this.noResults = noResults;
+    this.highlight = highlight;
+    this.onSelection = onSelection;
+
+    // Starts the app Engine
     this.init();
   }
 
@@ -102,7 +94,6 @@ export default class autoComplete {
   search(query, record) {
     // Current record value toLowerCase
     const recordLowerCase = record.toLowerCase();
-
     // Loose mode
     if (this.searchEngine === "loose") {
       // Search query string sanitized & normalized
@@ -111,12 +102,10 @@ export default class autoComplete {
       const match = [];
       // Query character position based on success
       let searchPosition = 0;
-
       // Iterate over record characters
       for (let number = 0; number < recordLowerCase.length; number++) {
         // Holds current record character
         let recordChar = record[number];
-
         // Matching case
         if (searchPosition < query.length && recordLowerCase[number] === query[searchPosition]) {
           // Highlight matching character
@@ -127,7 +116,6 @@ export default class autoComplete {
         // Adds matching character to the matching list
         match.push(recordChar);
       }
-
       // Non-Matching case
       if (searchPosition !== query.length) {
         return false;
@@ -154,18 +142,17 @@ export default class autoComplete {
    *
    * @return {*}
    */
-  listMatchedResults(data, event) {
+  listMatchedResults(data) {
     return new Promise(resolve => {
       // Final highlighted results list
       const resList = [];
-
       // Checks input has matches in data source
       data.filter((record, index) => {
         // Search/Matching function
         const search = key => {
           // This Record value
           const recordValue = key ? record[key] : record;
-          // Check if record isValid or NOT
+          // Check if record does exist before search
           if (recordValue) {
             // Holds match value
             const match =
@@ -190,7 +177,6 @@ export default class autoComplete {
             }
           }
         };
-
         // Checks if data key is set
         if (this.data.key) {
           // Iterates over all set data keys
@@ -202,27 +188,10 @@ export default class autoComplete {
           search();
         }
       });
-
       // Sorting / Slicing final results list
       const list = this.sort
         ? resList.sort(this.sort).slice(0, this.maxResults)
         : resList.slice(0, this.maxResults);
-
-      // If resultsList set NOT to render
-      if (this.resultsList.render) {
-        // Rendering matching results to the UI list
-        autoCompleteView.addResultsToList(this.resultsList.view, list, this.resultItem);
-        // Keyboard Navigation
-        // If Navigation customMethod is set or default
-        this.resultsList.navigation
-          ? this.resultsList.navigation(
-            event,
-            this.resultsList.view,
-            autoCompleteView.getInput(this.selector),
-          )
-          : autoCompleteView.navigation(this.selector, this.resultsList.view, this.resultsList.shadowRoot);
-      }
-
       // Returns rendered list
       return resolve({
         matches: resList.length,
@@ -239,13 +208,19 @@ export default class autoComplete {
   ignite() {
     // Specified Input field selector
     const input = autoCompleteView.getInput(this.selector);
-
     // Placeholder setter
     if (this.placeHolder) {
       input.setAttribute("placeholder", this.placeHolder);
     }
 
-    // Debouncer
+    /**
+     * Debouncer
+     *
+     * @param func
+     * @param delay
+     *
+     * @return void
+     */
     const debounce = (func, delay) => {
       let inDebounce;
       return function() {
@@ -256,20 +231,37 @@ export default class autoComplete {
       };
     };
 
-    // Excute autoComplete processes
+    /**
+     * Excute autoComplete processes
+     *
+     * @param event
+     *
+     * @return void
+     */
     const exec = event => {
       // Gets the input search value
       const inputValue =
-        input instanceof HTMLInputElement ? input.value.toLowerCase() : input.innerHTML.toLowerCase();
+        input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement
+          ? input.value.toLowerCase()
+          : input.innerHTML.toLowerCase();
       // Intercept query value
       const queryValue = (this.queryValue =
         this.query && this.query.manipulate ? this.query.manipulate(inputValue) : inputValue);
       // resultsList Render Switch
       const renderResultsList = this.resultsList.render;
       // App triggering condition
-      const triggerCondition =
-        this.trigger.condition || (queryValue.length > this.threshold && queryValue.replace(/ /g, "").length);
-      // Event emitter on input field
+      const triggerCondition = this.trigger.condition
+        ? this.trigger.condition(queryValue)
+        : queryValue.length > this.threshold && queryValue.replace(/ /g, "").length;
+
+      /**
+       * Event emitter on input field
+       *
+       * @param event
+       * @param results
+       *
+       * @return void
+       */
       const eventEmitter = (event, results) => {
         // Dispatch event on input
         input.dispatchEvent(
@@ -286,28 +278,36 @@ export default class autoComplete {
           }),
         );
       };
-
       // Checks if results will be rendered or NOT
       if (renderResultsList) {
+        const resultsList = this.resultsList.view;
         // Clear Results function holder
-        const clearResults = autoCompleteView.clearResults(this.resultsList.view);
-
+        const clearResults = autoCompleteView.clearResults(resultsList);
         // Check if input is not empty
         // or just have space before triggering the app
         if (triggerCondition) {
-          // List matching results
-          this.listMatchedResults(this.dataSrc, event).then(list => {
-            // Event emitter on input field
+          // > List matching results
+          this.listMatchedResults(this.dataStream, event).then(list => {
+            // 1- Event emitter on input field
             eventEmitter(event, list);
-            // Checks if there's results
-            if (list.list.length === 0 && this.noResults && this.resultsList.render) {
-              // Runs noResults action function
-              this.noResults();
-            } else {
-              // Gets user's selection
-              // If action configured
-              if (this.onSelection) {
-                autoCompleteView.getSelection(this.selector, this.resultsList.view, this.onSelection, list);
+            // 2- If resultsList set to render
+            if (this.resultsList.render) {
+              // 3- Checks if there's results
+              if (list.list.length === 0 && this.noResults) {
+                // 4- Runs noResults action function
+                this.noResults();
+              } else {
+                // 4- Rendering matching results to the UI list
+                autoCompleteView.addResultsToList(resultsList, list.list, this.resultItem);
+                // 5- Gets user's selection
+                // If action configured
+                if (this.onSelection) {
+                  // 6- Keyboard & Mouse Navigation
+                  // If Navigation customMethod is set or default
+                  this.resultsList.navigation
+                    ? this.resultsList.navigation(event, input, resultsList, this.onSelection, list)
+                    : autoCompleteView.navigation(input, resultsList, this.onSelection, list);
+                }
               }
             }
           });
@@ -319,38 +319,29 @@ export default class autoComplete {
         }
         // If results will NOT be rendered
       } else if (!renderResultsList && triggerCondition) {
-        this.listMatchedResults(this.dataSrc, event).then(list => {
+        this.listMatchedResults(this.dataStream, event).then(list => {
           // Event emitter on input field
           eventEmitter(event, list);
         });
-      } else {
-        // Event emitter on input field
-        eventEmitter(event);
       }
     };
 
-    // autoComplete.js run processes
+    /**
+     * autoComplete.js run processes
+     *
+     * @param event
+     *
+     * @return void
+     */
     const run = event => {
-      // If data src NOT to be cached
-      // then we should invoke its function again
-      if (!this.data.cache) {
-        // Check if data src is a Promise
-        // and resolve it before setting data src
-        if (this.data.src() instanceof Promise) {
-          this.data.src().then(response => {
-            this.dataSrc = response;
-            exec(event);
-          });
-          // Else if not Promise
-        } else {
-          this.dataSrc = this.data.src();
-          exec(event);
-        }
-        // Else if data src is local
-        // not external src
-      } else {
+      // Check if data src set to be cached or NOT
+      // Resolve data src before assigning and excuting
+      Promise.resolve(this.data.cache ? this.dataStream : this.data.src()).then(data => {
+        // Assign resolved data to the main data stream
+        this.dataStream = data;
+        // Invoke execution function
         exec(event);
-      }
+      });
     };
     // Updates results on input by default if navigation should be excluded
     // If option is provided as true, results will be shown on focus if input has initial text
@@ -360,24 +351,25 @@ export default class autoComplete {
   }
 
   /**
-   * Starts the app Engine.
+   * Starts the app Engine
    *
    * @return void
    */
   init() {
-    // Data source is Async
-    if (this.data.src() instanceof Promise) {
-      // Return Data
-      this.data.src().then(response => {
-        this.dataSrc = response;
+    // Checks if data set to be cached
+    if (this.data.cache) {
+      // Resolve data src before assigning and igniting
+      Promise.resolve(this.data.src()).then(data => {
+        // Assigning resolved data to the main data stream
+        this.dataStream = data;
+        // Invoke ignition function
         this.ignite();
       });
-      // Data source is Array/Function
+      // Else if data is NOT set to be  cached
     } else {
-      this.dataSrc = this.data.src();
+      // Invoke ignition function
       this.ignite();
     }
-
     // Polyfilling for IE11
     Polyfill.initElementClosestPolyfill();
   }

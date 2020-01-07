@@ -26,7 +26,45 @@ Release flags:
 
 ## Release Notes
 
-- v7.0.0 :sparkles:
+- v7.2.0 :sparkles:
+  - Added support to `textarea` input field (Thanks 👍 @EmilStenstrom)
+
+
+- v7.1.3
+  - Enhanced mouse selection (Thanks 👍 @adan-ferguson)
+
+
+- v7.1.2
+  - Fixed error behavior occurs when searching (Empty, False, Null) record
+
+
+- v7.1.1
+  - `resList` now is fully created in `DocumentFragment` before rendering for better performance (Thanks 👍 @asafwat)
+  - `config` parameters restructure (Thanks 👍 @asafwat)
+  - Reduced `autoComplete.js` weight
+
+- v7.1.0
+  - New improved Navigation logic (Thanks 👍 @mtomov)
+  - `shadowRoot` API support `[Removed]`
+  - Enhanced `resList.navigation` API data feedback
+  - Styling `[Changed]`
+  - Major code Refactor & Optimizations
+    - Faster performance
+    - Reduced `autoComplete.js` weight
+
+- v7.0.3
+  - Duplicate values selection bug fix (Thanks 👍 @plungerman)
+
+- v7.0.2
+  - Data Promise bug fix (Thanks 👍 @braco)
+  - Remote API duplicate calls fix (Thanks 👍 @srinivas025, @argebynogame)
+  - `trigger.condition` enhancement (Thanks 👍 @sakuraineed)
+  - Code Refactor for faster performance and lighter weight
+
+- v7.0.1
+  - `api multiple calls` issue fix (Thanks 👍 @srinivas025)
+
+- v7.0.0
   - New API for results list navigation `resultsList.navigation` (Thanks 👍 @fredluetkemeier)
   - New API for autoComplete.js engine `trigger.event` (Thanks 👍 @fredluetkemeier)
   - New API for autoComplete.js engine `trigger.condition`
