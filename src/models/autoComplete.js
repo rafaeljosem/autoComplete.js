@@ -149,40 +149,40 @@ export default class autoComplete {
       // Checks input has matches in data source
       data.filter((record, index) => {
         // Search/Matching function
-        const search = key => {
+        const search = /* key */ _ => {
           // This Record value
-          const recordValue = key ? record[key] : record;
+          // const recordValue = key ? record[key] : record;
           // Check if record does exist before search
-          if (recordValue) {
+          if (record/* recordValue */) {
             // Holds match value
             const match =
               typeof this.searchEngine === "function"
-                ? this.searchEngine(this.queryValue, recordValue)
-                : this.search(this.queryValue, recordValue);
+                ? this.searchEngine(this.queryValue, record /* recordValue */)
+                : this.search(this.queryValue, record /* recordValue */);
             // Push match to results list with key if set
-            if (match && key) {
+            if (match /* && key */) {
               resList.push({
-                key,
+                // key,
                 index,
                 match,
                 value: record,
               });
               // Push match to results list without key if not set
-            } else if (match && !key) {
+            } /* else if (match && !key) {
               resList.push({
                 index,
                 match,
                 value: record,
               });
-            }
+            }*/
           }
         };
         // Checks if data key is set
         if (this.data.key) {
           // Iterates over all set data keys
-          for (const key of this.data.key) {
-            search(key);
-          }
+          // for (const key of this.data.key) {
+            search(/* key */ this.data.key);
+          // }
           // If no data key not set
         } else {
           search();
